@@ -1,24 +1,11 @@
-# Python virtual environments
+﻿# Python virtual environments
 .venv/
 venv/
-
 # Python cache
 __pycache__/
 *.py[cod]
-
-# Build / tooling caches
-.pytest_cache/
-.mypy_cache/
-
-# Environment files
-.env
-
-# OS/editor artifacts
-.DS_Store
-Thumbs.db
-.vscode/
-.idea/
-
-# Generated outputs for this training repo
-Cursor_test/**/output/
-Cursor_test/**/study_hours.png
+# Generated outputs
+output/
+*.png
+# Java build outputs
+*.class
