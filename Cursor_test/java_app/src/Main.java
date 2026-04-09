@@ -10,17 +10,34 @@ public class Main {
         boolean isHeader = true;
         double sum = 0.0;
         int count = 0;
+        int rowNumber = 0; // CSV行号（含表头）
 
         while ((line = br.readLine()) != null) {
+            rowNumber++;
+
             if (isHeader) {
-                isHeader = false; // 跳过表头
+                isHeader = false;
+                continue;
+            }
+
+            if (line.trim().isEmpty()) {
                 continue;
             }
 
             String[] parts = line.split(",");
-            double hours = Double.parseDouble(parts[1]);
-            sum += hours;
-            count++;
+            if (parts.length < 2) {
+                br.close();
+                throw new IllegalArgumentException("CSV format error at row " + rowNumber);
+            }
+
+            try {
+                double hours = Double.parseDouble(parts[1].trim());
+                sum += hours;
+                count++;
+            } catch (NumberFormatException e) {
+                br.close();
+                throw new IllegalArgumentException("Invalid numeric value at row " + rowNumber + ": " + parts[1]);
+            }
         }
 
         br.close();
@@ -32,11 +49,17 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        // 从 java_app 出发，去读取 ../python_app/data/study_hours.csv
-        String csvPath = "..\\python_app\\data\\study_hours.csv";
+        String csvPath;
+
+        if (args.length > 0) {
+            csvPath = args[0];
+        } else {
+            csvPath = "..\\python_app\\data\\study_hours.csv";
+        }
 
         try {
             double avg = calculateAverageFromCsv(csvPath);
+            System.out.println("Input CSV: " + csvPath);
             System.out.println("Average study hours from CSV: " + avg);
 
             if (avg >= 2.0) {
@@ -45,9 +68,14 @@ public class Main {
                 System.out.println("Level: Keep Improving");
             }
         } catch (IOException e) {
-            System.out.println("File read error: " + e.getMessage());
-        } catch (NumberFormatException e) {
-            System.out.println("Data format error: " + e.getMessage());
+            System.out.println("[ERROR] File read error: " + e.getMessage());
+            System.exit(1);
+        } catch (IllegalArgumentException e) {
+            System.out.println("[ERROR] " + e.getMessage());
+            System.exit(1);
+        } catch (Exception e) {
+            System.out.println("[UNEXPECTED ERROR] " + e.getMessage());
+            System.exit(1);
         }
     }
 }

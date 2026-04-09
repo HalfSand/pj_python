@@ -22,6 +22,11 @@ def parse_args() -> argparse.Namespace:
         default="output",
         help="Output directory (relative to project root)",
     )
+    parser.add_argument(
+        "--no-plot",
+        action="store_true",
+        help="If set, skip plotting and only generate stats/report",
+    )
     return parser.parse_args()
 
 
@@ -46,12 +51,15 @@ def main():
         for key, value in stats.items():
             print(f"{key}: {value}")
 
-        plot_data(df, chart_path)
+        if args.no_plot:
+            print("\nSkip plotting because --no-plot is enabled.")
+        else:
+            plot_data(df, chart_path)
+            print(f"\nChart saved to: {chart_path}")
 
         with report_path.open("w", encoding="utf-8") as f:
             json.dump(stats, f, ensure_ascii=False, indent=2)
 
-        print(f"\nChart saved to: {chart_path}")
         print(f"Report saved to: {report_path}")
 
     except FileNotFoundError as e:
